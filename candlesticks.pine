@@ -1,0 +1,37 @@
+//@version=5
+indicator("Candlesticks",overlay=true)
+
+//References:
+// Pin Bar: https://forexbee.co/pin-bar-forex-trading-strategy/?expand_article=1
+
+var showPinBar = input.bool(false, "Mark candlestick pin bars?", group="Patterns")
+var showEngulfing = input.bool(false, "Mark engulfing candlesticks?", group="Patterns")
+var pinSizePerVal = input.int(75, "Size of the wick as a percentage.", group="Pin Bar Settings")
+var pinbarBodyPerVal = input.int(25, "The percent size of the body.", group="Pin Bar Settings")
+var pinSizePer = pinSizePerVal / 100
+var pinbarBodyPer = pinbarBodyPerVal / 100
+
+// Candlestick part lengths and percentages.
+candlestickLen = high - low
+bodyLen = math.abs(close - open)
+upShadowLen = (high - (open > close? open : close))
+downShadowLen = ((open > close? close : open) - low)
+bodyPer = bodyLen / candlestickLen
+upShadowPer = upShadowLen / candlestickLen
+downShadowPer = downShadowLen / candlestickLen
+
+showPinBar_h = showPinBar and upShadowPer > pinSizePer and bodyPer < pinbarBodyPer
+showPinBar_l = showPinBar and downShadowPer > pinSizePer and bodyPer < pinbarBodyPer
+
+plotshape(showPinBar_h, style=shape.arrowdown, color=color.red, location=location.top, text="Pin Bar", textcolor=color.red)
+//plotchar(showPinBar_h, text="Bear Pin Bar", char="", color=color.red)
+plotshape(showPinBar_l, style=shape.arrowup, color=color.lime, location=location.bottom, text="Pin Bar", textcolor=color.lime)
+//plotchar(showPinBar_l, text="Bull Pin Bar", char="", color=color.lime)
+
+showEngulfing_h = showEngulfing and open[1] > close[1] and close > open and open[1] <= close and close[1] >= open
+showEngulfing_l = showEngulfing and close[1] > open[1] and open > close and close[1]<= open and open[1] >= close
+
+plotshape(showEngulfing_h, style=shape.square, color=color.red, location=location.top, text="Engulf", textcolor=color.red)
+//plotchar(showEngulfing_h, text="Bear Engulf", char="", color=color.red)
+plotshape(showEngulfing_l, style=shape.square, color=color.lime, location=location.bottom, text="Engulf", textcolor=color.lime)
+//plotchar(showEngulfing_l, text="Bull Engulf", char="", color=color.lime)
