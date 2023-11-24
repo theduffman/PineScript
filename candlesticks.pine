@@ -28,8 +28,8 @@ plotshape(showPinBar_h, style=shape.arrowdown, color=color.red, location=locatio
 plotshape(showPinBar_l, style=shape.arrowup, color=color.lime, location=location.bottom, text="Pin Bar", textcolor=color.lime)
 //plotchar(showPinBar_l, text="Bull Pin Bar", char="", color=color.lime)
 
-showEngulfing_h = showEngulfing and open[1] > close[1] and close > open and open[1] <= close and close[1] >= open
-showEngulfing_l = showEngulfing and close[1] > open[1] and open > close and close[1]<= open and open[1] >= close
+showEngulfing_h = showEngulfing and close[1] > open[1] and open > close and close[1] <= open and open[1] >= close
+showEngulfing_l = showEngulfing and open[1] > close[1] and close > open and open[1] <= close and close[1] >= open
 
 plotshape(showEngulfing_h, style=shape.square, color=color.red, location=location.top, text="Engulf", textcolor=color.red)
 //plotchar(showEngulfing_h, text="Bear Engulf", char="", color=color.red)
