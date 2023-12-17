@@ -8,7 +8,7 @@ var showPinBar = input.bool(false, "Mark candlestick pin bars?", group="Patterns
 var showEngulfing = input.bool(false, "Mark engulfing candlesticks?", group="Patterns")
 var pinSizePerVal = input.int(50, "Size of the wick as a percentage.", group="Pin Bar Settings")
 var pinbarBodyPerVal = input.int(25, "The percent size of the body.", group="Pin Bar Settings")
-var reversal3Bar = input.bool(true, "Mark the 3rd candlestick in a 3-bar reversal pattern?", group="Patterns")
+var reversal3Bar = input.bool(false, "Mark the 3rd candlestick in a 3-bar reversal pattern?", group="Patterns")
 var pinSizePer = pinSizePerVal / 100
 var pinbarBodyPer = pinbarBodyPerVal / 100
 
@@ -55,7 +55,5 @@ else if (open[2] > close[2] and open[1] > close[1])
             show3Bar_h := true //-- Going Long
 
 
-plotshape(show3Bar_h, style=shape.circle, color=color.lime, location=location.top, text="3", textcolor=color.lime)
-plotshape(show3Bar_l, style=shape.circle, color=color.red, location=location.bottom, text="3", textcolor=color.red)
-
-
+plotshape(show3Bar_h and reversal3Bar, style=shape.circle, color=color.lime, location=location.top, text="3", textcolor=color.lime)
+plotshape(show3Bar_l and reversal3Bar, style=shape.circle, color=color.red, location=location.bottom, text="3", textcolor=color.red)
