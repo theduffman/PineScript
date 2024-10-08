@@ -1,0 +1,53 @@
+// This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © DuffmanRob
+
+//@version=5
+indicator("Multi-Timeframe RSI", overlay=false)
+
+rsi1_length = input.int(14, title="RSI Length 1")
+rsi2_length = input.int(14, title="RSI Length 2")
+rsi3_length = input.int(14, title="RSI Length 3")
+
+rsi_upper = input.int(70, title="RSI Upper Band")
+rsi_lower = input.int(30, title="RSI Lower Band")
+
+rsi1 = request.security(syminfo.tickerid, "1", ta.rsi(close, rsi1_length))
+rsi2 = request.security(syminfo.tickerid, "5", ta.rsi(close, rsi2_length))
+rsi3 = request.security(syminfo.tickerid, "15", ta.rsi(close, rsi3_length))
+
+hline(rsi_upper, "Upper Band", color=color.red)
+hline(50, "Middle Band", color=color.gray)
+hline(rsi_lower, "Lower Band", color=color.green)
+
+plot(rsi1, color=color.blue, title="RSI 1 min")
+plot(rsi2, color=color.orange, title="RSI 5 min")
+plot(rsi3, color=color.purple, title="RSI 15 min")
+
+//signal_above = (rsi1 >= rsi_upper) and (rsi2 >= rsi_upper) and (rsi3 >= rsi_upper)
+//signal_below = (rsi1 <= rsi_lower) and (rsi2 <= rsi_lower) and (rsi3 <= rsi_lower)
+
+vwap = ta.vwap(close)
+band1 = vwap * (1 + 0.05)
+band2 = vwap * (1 - 0.05)
+band3 = vwap * (1 + 0.1)
+band4 = vwap * (1 - 0.1)
+distance_to_vwap = math.abs(close - vwap)
+
+signal_below = (rsi1 - rsi1[1]) > 0 and (rsi2 - rsi2[1]) > 0 and (rsi3 - rsi3[1]) > 0 and rsi1[1] < 50 and rsi2[1] < 50 and rsi3[1] < 50 //and distance_to_vwap >= 10
+signal_above = (rsi1[1] - rsi1) > 0 and (rsi2[1] - rsi2) > 0 and (rsi3[1] - rsi3) > 0 and rsi1[1] > 50 and rsi2[1] > 50 and rsi3[1] > 50
+
+plotshape(signal_above, title="All RSI Above Upper Band", location=location.top, color=color.green, style=shape.triangleup, size=size.small)
+plotshape(signal_below, title="All RSI Below Lower Band", location=location.bottom, color=color.red, style=shape.triangledown, size=size.small)
+
+if signal_below
+    label.new(bar_index, rsi1, text=str.tostring(vwap)+"-"+str.tostring(close), style=label.style_label_down, color=color.white, textcolor=color.black)
+
+
+//plot(vwap, color=color.white, linewidth=2, title="VWAP")
+//plot(band1, color=color.green, title="VWAP Band 1 (Upper)")
+//plot(band2, color=color.red, title="VWAP Band 1 (Lower)")
+//plot(band3, color=color.green, title="VWAP Band 2 (Upper)")
+//plot(band4, color=color.red, title="VWAP Band 2 (Lower)")
+
+
+//plotchar(distance_to_vwap, char='D', color=color.yellow, title="Distance to VWAP")
