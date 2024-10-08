@@ -11,6 +11,8 @@ rsi3_length = input.int(14, title="RSI Length 3")
 rsi_upper = input.int(70, title="RSI Upper Band")
 rsi_lower = input.int(30, title="RSI Lower Band")
 
+vwap_min_distance = input.float(10.0, title="VWAP Distance")
+
 rsi1 = request.security(syminfo.tickerid, "1", ta.rsi(close, rsi1_length))
 rsi2 = request.security(syminfo.tickerid, "5", ta.rsi(close, rsi2_length))
 rsi3 = request.security(syminfo.tickerid, "15", ta.rsi(close, rsi3_length))
@@ -31,17 +33,13 @@ band1 = vwap * (1 + 0.05)
 band2 = vwap * (1 - 0.05)
 band3 = vwap * (1 + 0.1)
 band4 = vwap * (1 - 0.1)
-distance_to_vwap = math.abs(close - vwap)
+distance_to_vwap = math.abs(close - vwap) * 10000
 
-signal_below = (rsi1 - rsi1[1]) > 0 and (rsi2 - rsi2[1]) > 0 and (rsi3 - rsi3[1]) > 0 and rsi1[1] < 50 and rsi2[1] < 50 and rsi3[1] < 50 //and distance_to_vwap >= 10
-signal_above = (rsi1[1] - rsi1) > 0 and (rsi2[1] - rsi2) > 0 and (rsi3[1] - rsi3) > 0 and rsi1[1] > 50 and rsi2[1] > 50 and rsi3[1] > 50
+signal_below = (rsi1 - rsi1[1]) > 0 and (rsi2 - rsi2[1]) > 0 and (rsi3 - rsi3[1]) > 0 and rsi1[1] < 50 and rsi2[1] < 50 and rsi3[1] < 50 and distance_to_vwap >= vwap_min_distance
+signal_above = (rsi1[1] - rsi1) > 0 and (rsi2[1] - rsi2) > 0 and (rsi3[1] - rsi3) > 0 and rsi1[1] > 50 and rsi2[1] > 50 and rsi3[1] > 50 and distance_to_vwap >= vwap_min_distance
 
-plotshape(signal_above, title="All RSI Above Upper Band", location=location.top, color=color.green, style=shape.triangleup, size=size.small)
-plotshape(signal_below, title="All RSI Below Lower Band", location=location.bottom, color=color.red, style=shape.triangledown, size=size.small)
-
-if signal_below
-    label.new(bar_index, rsi1, text=str.tostring(vwap)+"-"+str.tostring(close), style=label.style_label_down, color=color.white, textcolor=color.black)
-
+plotshape(signal_above, title="All RSI Above Upper Band", location=location.top, color=color.red, style=shape.triangledown, size=size.small)
+plotshape(signal_below, title="All RSI Below Lower Band", location=location.bottom, color=color.green, style=shape.triangleup, size=size.small)
 
 //plot(vwap, color=color.white, linewidth=2, title="VWAP")
 //plot(band1, color=color.green, title="VWAP Band 1 (Upper)")
