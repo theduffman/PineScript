@@ -4,14 +4,16 @@
 //@version=5
 indicator("Multi-Timeframe RSI", overlay=false)
 
-rsi1_length = input.int(14, title="RSI Length 1")
-rsi2_length = input.int(14, title="RSI Length 2")
-rsi3_length = input.int(14, title="RSI Length 3")
+rsi1_length = input.int(10, title="RSI Length 1")
+rsi2_length = input.int(10, title="RSI Length 2")
+rsi3_length = input.int(10, title="RSI Length 3")
 
 rsi_upper = input.int(70, title="RSI Upper Band")
 rsi_lower = input.int(30, title="RSI Lower Band")
 
 vwap_min_distance = input.float(10.0, title="VWAP Distance")
+
+debug = input.bool(false, title="Debug output?")
 
 rsi1 = request.security(syminfo.tickerid, "1", ta.rsi(close, rsi1_length))
 rsi2 = request.security(syminfo.tickerid, "5", ta.rsi(close, rsi2_length))
@@ -40,6 +42,10 @@ signal_above = (rsi1[1] - rsi1) > 0 and (rsi2[1] - rsi2) > 0 and (rsi3[1] - rsi3
 
 plotshape(signal_above, title="All RSI Above Upper Band", location=location.top, color=color.red, style=shape.triangledown, size=size.small)
 plotshape(signal_below, title="All RSI Below Lower Band", location=location.bottom, color=color.green, style=shape.triangleup, size=size.small)
+
+if (signal_above or signal_below) and debug
+    label.new(bar_index, rsi1, text=str.tostring(distance_to_vwap), style=label.style_label_down, color=color.white, textcolor=color.black)
+
 
 //plot(vwap, color=color.white, linewidth=2, title="VWAP")
 //plot(band1, color=color.green, title="VWAP Band 1 (Upper)")
