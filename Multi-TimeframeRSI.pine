@@ -13,6 +13,8 @@ rsi_lower = input.int(30, title="RSI Lower Band")
 
 vwap_min_distance = input.float(10.0, title="VWAP Distance")
 
+rsi_min_cross_band_count = input.int(2, title="Min RSI Band Cross Count", minval=0, maxval=3)
+
 debug = input.bool(false, title="Debug output?")
 
 rsi1 = request.security(syminfo.tickerid, "1", ta.rsi(close, rsi1_length))
@@ -34,8 +36,6 @@ band3 = vwap * (1 + 0.1)
 band4 = vwap * (1 - 0.1)
 distance_to_vwap = math.abs(close - vwap) * 10000
 
-band_count_threshold = 2
-
 //-- UPPER BAND: RSI going up above the upper RSI band and then back down (preferrable sharply).
 signal_upper_rsi_up = (rsi1[1] - rsi1[2]) > 0 and (rsi2[1] - rsi2[2]) > 0 and (rsi3[1] - rsi3[2]) > 0
 signal_upper_rsi_count = (rsi1[1] >= rsi_upper? 1 : 0) + (rsi2[1] >= rsi_upper? 1 : 0) + (rsi3[1] >= rsi_upper? 1 : 0)
@@ -46,28 +46,22 @@ signal_lower_rsi_down = (rsi1[2] - rsi1[1]) > 0 and (rsi2[2] - rsi2[1]) > 0 and 
 signal_lower_rsi_count = (rsi1[1] <= rsi_lower? 1 : 0) + (rsi2[1] <= rsi_lower? 1 : 0) + (rsi3[1] <= rsi_lower? 1 : 0) 
 signal_lower_rsi_up = (rsi1 - rsi1[1]) > 0 and (rsi2 - rsi2[1]) > 0 and (rsi3 - rsi3[1]) > 0
 
-signal_upper3 = signal_upper_rsi_up and signal_upper_rsi_count == 3 and signal_upper_rsi_down and distance_to_vwap >= vwap_min_distance
-signal_lower3 = signal_lower_rsi_down and signal_lower_rsi_count == 3 and signal_lower_rsi_up and distance_to_vwap >= vwap_min_distance
-
+signal_upper3 = signal_upper_rsi_up and signal_upper_rsi_down and distance_to_vwap >= vwap_min_distance and signal_upper_rsi_count == 3 and rsi_min_cross_band_count <= 3
 plotshape(signal_upper3, title="All RSI Above Upper Band", location=location.top, color=color.red, style=shape.diamond, size=size.tiny)
+signal_lower3 = signal_lower_rsi_down and signal_lower_rsi_up and distance_to_vwap >= vwap_min_distance and signal_lower_rsi_count == 3 and rsi_min_cross_band_count <= 3
 plotshape(signal_lower3, title="All RSI Below Lower Band", location=location.bottom, color=color.green, style=shape.diamond, size=size.tiny)
 
-signal_upper2 = signal_upper_rsi_up and signal_upper_rsi_count == 2 and signal_upper_rsi_down and distance_to_vwap >= vwap_min_distance
-signal_lower2 = signal_lower_rsi_down and signal_lower_rsi_count == 2 and signal_lower_rsi_up and distance_to_vwap >= vwap_min_distance
-
+signal_upper2 = signal_upper_rsi_up and signal_upper_rsi_down and distance_to_vwap >= vwap_min_distance and signal_upper_rsi_count == 2 and rsi_min_cross_band_count <= 2
 plotshape(signal_upper2, title="All RSI Above Upper Band", location=location.top, color=color.red, style=shape.triangledown, size=size.tiny)
+signal_lower2 = signal_lower_rsi_down and signal_lower_rsi_up and distance_to_vwap >= vwap_min_distance and signal_lower_rsi_count == 2 and rsi_min_cross_band_count <= 2
 plotshape(signal_lower2, title="All RSI Below Lower Band", location=location.bottom, color=color.green, style=shape.triangleup, size=size.tiny)
 
-signal_upper1 = signal_upper_rsi_up and signal_upper_rsi_count == 1 and signal_upper_rsi_down and distance_to_vwap >= vwap_min_distance
-signal_lower1 = signal_lower_rsi_down and signal_lower_rsi_count == 1 and signal_lower_rsi_up and distance_to_vwap >= vwap_min_distance
-
+signal_upper1 = signal_upper_rsi_up and signal_upper_rsi_down and distance_to_vwap >= vwap_min_distance and signal_upper_rsi_count == 1 and rsi_min_cross_band_count <= 1
 plotshape(signal_upper1, title="All RSI Above Upper Band", location=location.top, color=color.red, style=shape.square, size=size.tiny)
+signal_lower1 = signal_lower_rsi_down and signal_lower_rsi_up and distance_to_vwap >= vwap_min_distance and signal_lower_rsi_count == 1 and rsi_min_cross_band_count <= 1
 plotshape(signal_lower1, title="All RSI Below Lower Band", location=location.bottom, color=color.green, style=shape.square, size=size.tiny)
 
-signal_upper = signal_upper_rsi_up and signal_upper_rsi_count == 0 and signal_upper_rsi_down and distance_to_vwap >= vwap_min_distance
-signal_lower = signal_lower_rsi_down and signal_lower_rsi_count == 0 and signal_lower_rsi_up and distance_to_vwap >= vwap_min_distance
-
+signal_upper = signal_upper_rsi_up and signal_upper_rsi_down and distance_to_vwap >= vwap_min_distance and signal_upper_rsi_count == 0 and rsi_min_cross_band_count <= 0
 plotshape(signal_upper, title="All RSI Above Upper Band", location=location.top, color=color.red, style=shape.circle, size=size.tiny)
+signal_lower = signal_lower_rsi_down and signal_lower_rsi_up and distance_to_vwap >= vwap_min_distance and signal_lower_rsi_count == 0 and rsi_min_cross_band_count <= 0
 plotshape(signal_lower, title="All RSI Below Lower Band", location=location.bottom, color=color.green, style=shape.circle, size=size.tiny)
-
-
