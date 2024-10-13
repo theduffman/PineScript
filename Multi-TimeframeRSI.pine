@@ -4,30 +4,32 @@
 //@version=5
 indicator("Multi-Timeframe RSI", overlay=false)
 
-rsi1_length = input.int(10, title="RSI Length 1")
-rsi2_length = input.int(10, title="RSI Length 2")
-rsi3_length = input.int(10, title="RSI Length 3")
+rsi1_length = input.int(10, title="RSI 1 Length")
+rsi2_length = input.int(10, title="RSI 2 Length")
+rsi3_length = input.int(10, title="RSI 3 Length")
+
+rsi_timeframe1 = input.string("1", "RSI 1 Timeframe")
+rsi_timeframe2 = input.string("5", "RSI 2 Timeframe")
+rsi_timeframe3 = input.string("15", "RSI 3 Timeframe")
 
 rsi_upper = input.int(70, title="RSI Upper Band")
 rsi_lower = input.int(30, title="RSI Lower Band")
 
 vwap_min_distance = input.float(10.0, title="VWAP Distance")
 
-rsi_min_cross_band_count = input.int(2, title="Min RSI Band Cross Count", minval=0, maxval=3)
-
 debug = input.bool(false, title="Debug output?")
 
-rsi1 = request.security(syminfo.tickerid, "1", ta.rsi(close, rsi1_length))
-rsi2 = request.security(syminfo.tickerid, "5", ta.rsi(close, rsi2_length))
-rsi3 = request.security(syminfo.tickerid, "15", ta.rsi(close, rsi3_length))
+rsi1 = request.security(syminfo.tickerid, rsi_timeframe1, ta.rsi(close, rsi1_length))
+rsi2 = request.security(syminfo.tickerid, rsi_timeframe2, ta.rsi(close, rsi2_length))
+rsi3 = request.security(syminfo.tickerid, rsi_timeframe3, ta.rsi(close, rsi3_length))
 
 hline(rsi_upper, "Upper Band", color=color.red)
 hline(50, "Middle Band", color=color.gray)
 hline(rsi_lower, "Lower Band", color=color.green)
 
-plot(rsi1, color=color.blue, title="RSI 1 min")
-plot(rsi2, color=color.orange, title="RSI 5 min")
-plot(rsi3, color=color.purple, title="RSI 15 min")
+plot(rsi1, color=color.blue, title="RSI 1")
+plot(rsi2, color=color.orange, title="RSI 2")
+plot(rsi3, color=color.purple, title="RSI 3")
 
 vwap = ta.vwap(close)
 band1 = vwap * (1 + 0.05)
@@ -35,6 +37,8 @@ band2 = vwap * (1 - 0.05)
 band3 = vwap * (1 + 0.1)
 band4 = vwap * (1 - 0.1)
 distance_to_vwap = math.abs(close - vwap) * 10000
+
+band_count_threshold = 2
 
 //-- UPPER BAND: RSI going up above the upper RSI band and then back down (preferrable sharply).
 signal_upper_rsi_up = (rsi1[1] - rsi1[2]) > 0 and (rsi2[1] - rsi2[2]) > 0 and (rsi3[1] - rsi3[2]) > 0
@@ -46,22 +50,26 @@ signal_lower_rsi_down = (rsi1[2] - rsi1[1]) > 0 and (rsi2[2] - rsi2[1]) > 0 and 
 signal_lower_rsi_count = (rsi1[1] <= rsi_lower? 1 : 0) + (rsi2[1] <= rsi_lower? 1 : 0) + (rsi3[1] <= rsi_lower? 1 : 0) 
 signal_lower_rsi_up = (rsi1 - rsi1[1]) > 0 and (rsi2 - rsi2[1]) > 0 and (rsi3 - rsi3[1]) > 0
 
-signal_upper3 = signal_upper_rsi_up and signal_upper_rsi_down and distance_to_vwap >= vwap_min_distance and signal_upper_rsi_count == 3 and rsi_min_cross_band_count <= 3
+signal_upper3 = signal_upper_rsi_up and signal_upper_rsi_count == 3 and signal_upper_rsi_down and distance_to_vwap >= vwap_min_distance
+signal_lower3 = signal_lower_rsi_down and signal_lower_rsi_count == 3 and signal_lower_rsi_up and distance_to_vwap >= vwap_min_distance
+
 plotshape(signal_upper3, title="All RSI Above Upper Band", location=location.top, color=color.red, style=shape.diamond, size=size.tiny)
-signal_lower3 = signal_lower_rsi_down and signal_lower_rsi_up and distance_to_vwap >= vwap_min_distance and signal_lower_rsi_count == 3 and rsi_min_cross_band_count <= 3
 plotshape(signal_lower3, title="All RSI Below Lower Band", location=location.bottom, color=color.green, style=shape.diamond, size=size.tiny)
 
-signal_upper2 = signal_upper_rsi_up and signal_upper_rsi_down and distance_to_vwap >= vwap_min_distance and signal_upper_rsi_count == 2 and rsi_min_cross_band_count <= 2
+signal_upper2 = signal_upper_rsi_up and signal_upper_rsi_count == 2 and signal_upper_rsi_down and distance_to_vwap >= vwap_min_distance
+signal_lower2 = signal_lower_rsi_down and signal_lower_rsi_count == 2 and signal_lower_rsi_up and distance_to_vwap >= vwap_min_distance
+
 plotshape(signal_upper2, title="All RSI Above Upper Band", location=location.top, color=color.red, style=shape.triangledown, size=size.tiny)
-signal_lower2 = signal_lower_rsi_down and signal_lower_rsi_up and distance_to_vwap >= vwap_min_distance and signal_lower_rsi_count == 2 and rsi_min_cross_band_count <= 2
 plotshape(signal_lower2, title="All RSI Below Lower Band", location=location.bottom, color=color.green, style=shape.triangleup, size=size.tiny)
 
-signal_upper1 = signal_upper_rsi_up and signal_upper_rsi_down and distance_to_vwap >= vwap_min_distance and signal_upper_rsi_count == 1 and rsi_min_cross_band_count <= 1
+signal_upper1 = signal_upper_rsi_up and signal_upper_rsi_count == 1 and signal_upper_rsi_down and distance_to_vwap >= vwap_min_distance
+signal_lower1 = signal_lower_rsi_down and signal_lower_rsi_count == 1 and signal_lower_rsi_up and distance_to_vwap >= vwap_min_distance
+
 plotshape(signal_upper1, title="All RSI Above Upper Band", location=location.top, color=color.red, style=shape.square, size=size.tiny)
-signal_lower1 = signal_lower_rsi_down and signal_lower_rsi_up and distance_to_vwap >= vwap_min_distance and signal_lower_rsi_count == 1 and rsi_min_cross_band_count <= 1
 plotshape(signal_lower1, title="All RSI Below Lower Band", location=location.bottom, color=color.green, style=shape.square, size=size.tiny)
 
-signal_upper = signal_upper_rsi_up and signal_upper_rsi_down and distance_to_vwap >= vwap_min_distance and signal_upper_rsi_count == 0 and rsi_min_cross_band_count <= 0
+signal_upper = signal_upper_rsi_up and signal_upper_rsi_count == 0 and signal_upper_rsi_down and distance_to_vwap >= vwap_min_distance
+signal_lower = signal_lower_rsi_down and signal_lower_rsi_count == 0 and signal_lower_rsi_up and distance_to_vwap >= vwap_min_distance
+
 plotshape(signal_upper, title="All RSI Above Upper Band", location=location.top, color=color.red, style=shape.circle, size=size.tiny)
-signal_lower = signal_lower_rsi_down and signal_lower_rsi_up and distance_to_vwap >= vwap_min_distance and signal_lower_rsi_count == 0 and rsi_min_cross_band_count <= 0
 plotshape(signal_lower, title="All RSI Below Lower Band", location=location.bottom, color=color.green, style=shape.circle, size=size.tiny)
