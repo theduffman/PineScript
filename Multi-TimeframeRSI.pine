@@ -73,3 +73,10 @@ signal_lower = signal_lower_rsi_down and signal_lower_rsi_count == 0 and signal_
 
 plotshape(signal_upper, title="All RSI Above Upper Band", location=location.top, color=color.red, style=shape.circle, size=size.tiny)
 plotshape(signal_lower, title="All RSI Below Lower Band", location=location.bottom, color=color.green, style=shape.circle, size=size.tiny)
+
+rsi_lower_check = rsi1[1] <= rsi_lower and rsi2 <= rsi_lower and rsi3 <= rsi_lower 
+test_signal_lower = rsi_lower_check[1] and rsi_lower_check == false
+plotshape(test_signal_lower, title="RSI Test Signal", location=location.bottom, color=color.white, style=shape.xcross, size=size.tiny)
+rsi_upper_check = rsi1[1] >= rsi_upper and rsi2 >= rsi_upper and rsi3 >= rsi_upper
+test_signal_upper = rsi_upper_check[1] and rsi_upper_check == false
+plotshape(test_signal_upper, title="RSI Test Signal", location=location.top, color=color.white, style=shape.xcross, size=size.tiny)
