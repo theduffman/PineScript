@@ -109,12 +109,14 @@ plotshape(signal_lower, title="All RSI Below Lower Band", location=location.bott
 
 //rsi_upper_check = rsi1[1] >= rsi_upper and rsi2 >= rsi_upper and rsi3 >= rsi_upper
 //test_signal_upper = rsi_upper_check[1] and rsi_upper_check == false
-rsi_upper_check = rsi1 < rsi_upper and rsi2 < rsi_upper and rsi3 < rsi_upper and ta.highest(rsi1, rsi_look_back) >= rsi_upper and ta.highest(rsi2, rsi_look_back) >= rsi_upper and ta.highest(rsi3, rsi_look_back) >= rsi_upper
-test_signal_upper = rsi_upper_check[1] and rsi_upper_check == false
+//rsi_upper_check = rsi1 < rsi_upper and rsi2 < rsi_upper and rsi3 < rsi_upper and ta.highest(rsi1, rsi_look_back) >= rsi_upper and ta.highest(rsi2, rsi_look_back) >= rsi_upper and ta.highest(rsi3, rsi_look_back) >= rsi_upper
+//test_signal_upper = rsi_upper_check[1] and rsi_upper_check == false
+test_signal_upper = rsi_aub_count <= 1 and rsi_aub_count[1] > 0 and rsi_aub_lb_count[1] == rsi_count
 plotshape(test_signal_upper, title="RSI Test Signal", location=location.top, color=vwap_upper_color, style=shape.xcross, size=size.tiny)
 
 //rsi_lower_check = rsi1[1] <= rsi_lower and rsi2 <= rsi_lower and rsi3 <= rsi_lower 
 //test_signal_lower = rsi_lower_check[1] and rsi_lower_check == false
-rsi_lower_check = ta.lowest(rsi1, rsi_look_back) <= rsi_lower and ta.lowest(rsi2, rsi_look_back) <= rsi_lower and ta.lowest(rsi3, rsi_look_back) <= rsi_lower and rsi1 > rsi_lower and rsi2 > rsi_lower and rsi3 > rsi_lower
-test_signal_lower = rsi_lower_check and rsi_lower_check[1] == false //rsi_lower_check[1] and rsi_lower_check == false
+//rsi_lower_check = ta.lowest(rsi1, rsi_look_back) <= rsi_lower and ta.lowest(rsi2, rsi_look_back) <= rsi_lower and ta.lowest(rsi3, rsi_look_back) <= rsi_lower and rsi1 > rsi_lower and rsi2 > rsi_lower and rsi3 > rsi_lower
+//test_signal_lower = rsi_lower_check and rsi_lower_check[1] == false //rsi_lower_check[1] and rsi_lower_check == false
+test_signal_lower = rsi_blb_count <= 1 and rsi_blb_count[1] > 0 and rsi_blb_lb_count[1] == rsi_count
 plotshape(test_signal_lower, title="RSI Test Signal", location=location.bottom, color=vwap_lower_color, style=shape.xcross, size=size.tiny)
